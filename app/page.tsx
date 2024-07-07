@@ -1,113 +1,248 @@
-import Image from "next/image";
+"use client";
+import Lottie from "react-lottie-player";
+import lottieJson from "../public/clock.json";
+import { useState } from "react";
+import Countdown, { CountdownRenderProps } from "react-countdown";
 
 export default function Home() {
+  const [inputValues, setInputValues] = useState({
+    days: 0,
+    minutes: 0,
+    seconds: 0,
+  });
+  const [targetDate, setTargetDate] = useState<number | null>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setInputValues((prevValues) => ({
+      ...prevValues,
+      [name]: Number(value),
+    }));
+  };
+
+  const startCountdown = () => {
+    const now = new Date().getTime();
+    const endTime =
+      now +
+      inputValues.days * 24 * 60 * 60 * 1000 +
+      inputValues.minutes * 60 * 1000 +
+      inputValues.seconds * 1000;
+    setTargetDate(endTime);
+  };
+
+  const clearCountdown = () => {
+    setTargetDate(null);
+    setInputValues({ days: 0, minutes: 0, seconds: 0 });
+  };
+
+  const renderer = ({
+    days,
+    hours,
+    minutes,
+    seconds,
+    completed,
+  }: CountdownRenderProps) => {
+    if (completed) {
+      return <span>Time's up!</span>;
+    } else {
+      return (
+        <span>
+          {days}:{minutes < 10 ? `0${minutes}` : minutes}:
+          {seconds < 10 ? `0${seconds}` : seconds}
+        </span>
+      );
+    }
+  };
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 w-full max-w-5xl items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:size-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
+    <section>
+      {/* Discount */}
+
+      <div className="lg:flex justify-center items-center h-screen w-full flex-col border-2 border-red-400 hidden ">
+        <div className="flex justify-between max-w-[1500px] rounded-[160px] py-1 px-5  items-center bg-banner  w-full">
+          <div className="flex justify-center items-center gap-2">
+            <Lottie
+              loop
+              animationData={lottieJson}
+              play
+              style={{ width: 50, height: 50 }}
             />
-          </a>
+            <h2 className="text-[18px] text-black font-semibold ">
+              LIMITED TIME OFFER
+            </h2>
+          </div>
+
+          <div className="">
+            <h1 className="title ">
+              {" "}
+              Ends in :
+              {targetDate ? (
+                <span className="font-semibold tex-[18px]">
+                  {" "}
+                  <Countdown date={targetDate} renderer={renderer} />{" "}
+                </span>
+              ) : (
+                " 0 : 0 : 0 "
+              )}
+            </h1>
+          </div>
+          <div className="flex justify-center items-center gap-5">
+            <h2 className="text-[18px] text-black font-semibold">
+              GET 10% OFF
+            </h2>
+            <h2 className="text-[18px] text-black">
+              Use Code: <span className="font-semibold">EXAMSTART</span>
+            </h2>
+          </div>
+        </div>
+
+        <div className="input-container gap-4 mt-9 flex border-2 border-red-500 justify-center items-center py-3 px-3 rounded-lg">
+          <div className="">
+            <h4 className="text-black text-[18px] font-semibold">
+              Please select time from here :
+            </h4>
+          </div>
+          <label className="flex gap-3">
+            Hours:
+            <input
+              type="number"
+              name="days"
+              value={inputValues.days}
+              onChange={handleChange}
+              className="border-2 border-black px-1 rounded-md"
+            />
+          </label>
+
+          <label className="flex gap-3">
+            Minutes:
+            <input
+              type="number"
+              name="minutes"
+              value={inputValues.minutes}
+              onChange={handleChange}
+              className="border-2 border-black px-1 rounded-md"
+            />
+          </label>
+          <label className="flex gap-3">
+            Seconds:
+            <input
+              type="number"
+              name="seconds"
+              value={inputValues.seconds}
+              onChange={handleChange}
+              className="border-2 border-black px-1 rounded-md"
+            />
+          </label>
+        </div>
+        <div className="buttons mt-9 flex gap-5">
+          <button
+            onClick={startCountdown}
+            className="bg-green-900 text-white text-[18px] rounded-xl px-6 py-2"
+          >
+            Start Timer
+          </button>
+          <button
+            onClick={clearCountdown}
+            className="bg-red-900 rounded-xl px-6 py-2 text-[18px] text-white"
+          >
+            Clear
+          </button>
         </div>
       </div>
 
-      <div className="relative z-[-1] flex place-items-center before:absolute before:h-[300px] before:w-full before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 sm:before:w-[480px] sm:after:w-[240px] before:lg:h-[360px]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
+      {/* Mobile  */}
+
+      <div className="flex lg:hidden flex-col justify-center items-center w-full h-screen px-[15px] ">
+        <div className="border-2  border-[#ffd57c] gap-2 flex flex-col rounded-lg bg-[#ffecca] w-full justify-center items-center py-[10px]">
+          <div className="flex justify-center items-center gap-2 w-full ">
+            <Lottie
+              loop
+              animationData={lottieJson}
+              play
+              style={{ width: 40, height: 40 }}
+            />
+            <div className="flex justify-center items-center flex-col gap-1">
+              <h2 className="text-[14px] text-black font-semibold ">
+                LIMITED TIME OFFER
+              </h2>
+              <hr className="h-[0.5px] bg-[#a1a1a1] w-[85%]"></hr>
+            </div>
+          </div>
+          <div className="w-full flex justify-center items-center">
+            <h1 className="title ">
+              {" "}
+              Ends in :
+              {targetDate ? (
+                <span className="font-semibold tex-[14px]">
+                  {" "}
+                  <Countdown date={targetDate} renderer={renderer} />{" "}
+                </span>
+              ) : (
+                " 0 : 0 : 0 "
+              )}
+            </h1>
+          </div>
+          <div className="flex justify-center items-center gap-5 bg-[#ffd57c] w-full py-1">
+            <h2 className="text-[14px] text-black font-semibold">
+              GET 10% OFF
+            </h2>
+            <h2 className="text-[14px] text-black">
+              Use Code: <span className="font-semibold">EXAMSTART</span>
+            </h2>
+          </div>
+        </div>
+        <div className="input-container gap-4 mt-9 flex border-2 flex-col  border-red-500 justify-center items-center py-3 px-3 rounded-lg">
+          <div className="flex flex-col justify-center items-center gap-5">
+            <h4 className="text-black text-[18px] font-semibold">
+              Please select time from here :
+            </h4>
+            <label className="flex gap-3">
+              Hours:
+              <input
+                type="number"
+                name="days"
+                value={inputValues.days}
+                onChange={handleChange}
+                className="border-2 border-black px-1 rounded-md"
+              />
+            </label>
+
+            <label className="flex gap-3">
+              Minutes:
+              <input
+                type="number"
+                name="minutes"
+                value={inputValues.minutes}
+                onChange={handleChange}
+                className="border-2 border-black px-1 rounded-md"
+              />
+            </label>
+            <label className="flex gap-3">
+              Seconds:
+              <input
+                type="number"
+                name="seconds"
+                value={inputValues.seconds}
+                onChange={handleChange}
+                className="border-2 border-black px-1 rounded-md"
+              />
+            </label>
+          </div>
+          <div className="buttons mt-9 flex gap-5">
+            <button
+              onClick={startCountdown}
+              className="bg-green-900 text-white text-[18px] rounded-xl px-6 py-2"
+            >
+              Start Timer
+            </button>
+            <button
+              onClick={clearCountdown}
+              className="bg-red-900 rounded-xl px-6 py-2 text-[18px] text-white"
+            >
+              Clear
+            </button>
+          </div>
+        </div>
       </div>
-
-      <div className="mb-32 grid text-center lg:mb-0 lg:w-full lg:max-w-5xl lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-sm opacity-50">
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className="mb-3 text-2xl font-semibold">
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className="m-0 max-w-[30ch] text-balance text-sm opacity-50">
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </section>
   );
 }
